@@ -1,0 +1,95 @@
+@startuml
+' Egyetemi tanulmanyi rendszer - class diagram of the implemented code
+
+abstract class Szemely {
+  - azonosito : String {final}
+  - nev : String
+  - email : String
+  # Szemely(azonosito, nev, email)
+  + getAzonosito() : String
+  + getNev() : String
+  + getEmail() : String
+  + setEmail(email : String)
+  + equals(o : Object) : boolean
+  + hashCode() : int
+  + toString() : String
+}
+
+class Hallgato {
+  - beiratkozasok : List<Beiratkozas>
+  + beiratkozik(kurzus : Kurzus, felev : Felev) : Beiratkozas
+  + getBeiratkozasok() : List<Beiratkozas>
+  + sulyozottAtlag() : double
+  + megszerzettKredit() : int
+}
+
+class Oktato {
+  - kurzusok : List<Kurzus>
+  ~ addKurzus(k : Kurzus)
+  + getKurzusok() : List<Kurzus>
+}
+
+class Kurzus {
+  - kod : String
+  - nev : String
+  - kredit : int
+  - maxLetszam : int
+  - oktato : Oktato
+  - beiratkozasok : List<Beiratkozas>
+  + Kurzus(kod, nev, kredit, maxLetszam, oktato : Oktato)
+  + letszam(felev : Felev) : long
+  + telt(felev : Felev) : boolean
+  + atmenesiArany() : double
+  ~ addBeiratkozas(b : Beiratkozas)
+  + toString() : String
+}
+
+class Beiratkozas {
+  - hallgato : Hallgato
+  - kurzus : Kurzus
+  - felev : Felev
+  - jegy : Jegy
+  ~ Beiratkozas(hallgato, kurzus, felev)
+  + getJegy() : Optional<Jegy>
+  + setJegy(ertek : int)
+  + toString() : String
+}
+
+class Jegy <<record>> {
+  ertek : int  {1..10}
+  + atment() : boolean
+}
+
+class Felev <<record>> {
+  ev : int
+  szam : int  {1 or 2}
+  + compareTo(other : Felev) : int
+}
+
+interface "Comparable<Felev>" as Comparable
+
+class Lekerdezesek <<utility>> {
+  + {static} legjobbHaromHallgato(k : Kurzus) : List<Hallgato>
+  + {static} kreditekOktatonkent(kurzusok : List<Kurzus>) : Map<Oktato, Integer>
+}
+
+' inheritance
+Szemely <|-- Hallgato
+Szemely <|-- Oktato
+Comparable <|.. Felev
+
+' composition: the enrollment lives and dies with the student
+Hallgato "1" *-- "0..*" Beiratkozas : beiratkozasok >
+
+' composition: the grade belongs to exactly one enrollment
+Beiratkozas "1" *-- "0..1" Jegy : jegy >
+
+' association: each enrollment points to exactly 1 course and 1 semester
+Beiratkozas "0..*" --> "1" Kurzus : kurzus >
+Beiratkozas "0..*" --> "1" Felev : felev >
+
+' aggregation: a teacher has courses, but the courses are separate objects
+Oktato "1" o-- "0..*" Kurzus : tart >
+
+Lekerdezesek ..> Kurzus : <<uses>>
+@enduml
