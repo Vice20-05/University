@@ -91,3 +91,7 @@ into https://www.plantuml.com/plantuml. It shows:
    are not equal.
 7. **Not done from the stretch tasks:** transcript file export and prerequisites
    (to keep the code simple).
+
+## Note
+
+Claude only checked if the folders have README and gitignore and pushed them so all of them are pushed
